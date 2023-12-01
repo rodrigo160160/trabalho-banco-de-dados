@@ -1,4 +1,72 @@
 # trabalho-banco-de-dados
+
+Prints do DER e MER
+
+MER
+https://lucid.app/lucidchart/cc39c4d1-3cc1-4658-8981-13de95ee45a6/edit?view_items=BQxRPSTkr.l~&invitationId=inv_0c0a9259-6897-4c39-b2ff-d1fecf9094aa
+
+DER
+
+https://viewer.diagrams.net/?page-id=PdiCyLo0LYaeal8yXUiq&highlight=0000ff&edit=_blank&layers=1&nav=1&hide-pages=1#G1p1hPiBHmziPiiGXQSECebIl7kXGN7o_q
+
+Códigos das criações de tabelas no SGBD
+OBS: esse códigos serão usados no SQL SERVER
+
+-- Criação da Tabela Produto
+CREATE TABLE Produto (
+    CodigoProduto INT PRIMARY KEY,
+    Nome NVARCHAR(255),
+    Descricao NVARCHAR(MAX),
+    PrecoUnitario DECIMAL(10, 2),
+    Peso DECIMAL(5, 2),
+    DataCadastro DATE
+);
+
+-- Criação da Tabela Cliente
+CREATE TABLE Cliente (
+    IdCliente INT PRIMARY KEY,
+    Nome NVARCHAR(255),
+    Endereco NVARCHAR(MAX),
+    Contato NVARCHAR(15)
+);
+
+-- Criação da Tabela Fornecedor
+CREATE TABLE Fornecedor (
+    IdFornecedor INT PRIMARY KEY,
+    Nome NVARCHAR(255),
+    Endereco NVARCHAR(MAX),
+    Contato NVARCHAR(15),
+    ProdutosFornecidos NVARCHAR(MAX)
+);
+
+-- Criação da Tabela Venda
+CREATE TABLE Venda (
+    NumeroVenda INT PRIMARY KEY,
+    Data DATE,
+    QuantidadeVendida INT,
+    Total DECIMAL(10, 2),
+    IdCliente INT,
+    CodigoProduto INT,
+    FOREIGN KEY (IdCliente) REFERENCES Cliente(IdCliente),
+    FOREIGN KEY (CodigoProduto) REFERENCES Produto(CodigoProduto)
+);
+-- Criação da Tabela CarrinhoDeCompras
+CREATE TABLE CarrinhoDeCompras (
+    IdCarrinho INT PRIMARY KEY,
+    IdCliente INT,
+    CONSTRAINT fk_cliente_carrinho FOREIGN KEY (IdCliente) REFERENCES Cliente(IdCliente)
+);
+
+-- Tabela associativa entre CarrinhoDeCompras e Produto
+CREATE TABLE CarrinhoProduto (
+    IdCarrinho INT,
+    CodigoProduto INT,
+    Quantidade INT,
+    PRIMARY KEY (IdCarrinho, CodigoProduto),
+    FOREIGN KEY (IdCarrinho) REFERENCES CarrinhoDeCompras(IdCarrinho),
+    FOREIGN KEY (CodigoProduto) REFERENCES Produto(CodigoProduto)
+);
+
 Códigos da tabela produto
 INSERT INTO Produto (CodigoProduto, Nome, Descricao, PrecoUnitario, Peso, DataCadastro)
 VALUES
@@ -110,6 +178,72 @@ VALUES
     (18, '2024-06-30', 1, 23.25, 18, 18),
     (19, '2024-07-10', 3, 22.50, 19, 19),
     (20, '2024-08-15', 5, 97.50, 20, 20);
-    
-    
+
+Seleção,Filtros e Oradenação
+
+Listar todos os produtos com suas descrições:
+SELECT CodigoProduto, Nome, Descricao
+FROM Produto;
+
+Listar os clientes e os produtos que compraram:
+SELECT c.Nome AS Cliente, p.Nome AS Produto
+FROM Cliente c
+JOIN Venda v ON c.IdCliente = v.IdCliente
+JOIN Produto p ON v.CodigoProduto = p.CodigoProduto;
+
+ Mostrar vendas de um produto específico ordenadas por quantidade vendida:
+SELECT v.NumeroVenda, p.Nome AS Produto, v.QuantidadeVendida
+FROM Venda v
+JOIN Produto p ON v.CodigoProduto = p.CodigoProduto
+WHERE p.Nome = 'Arroz'
+ORDER BY v.QuantidadeVendida DESC;
+
+Exibir fornecedores e os produtos que eles fornecem:
+SELECT f.Nome AS Fornecedor, f.ProdutosFornecidos
+FROM Fornecedor f;
+
+Listar os produtos no carrinho de compras de um cliente específico:
+SELECT c.Nome AS Cliente, p.Nome AS Produto, cp.Quantidade
+FROM CarrinhoDeCompras cdc
+JOIN Cliente c ON cdc.IdCliente = c.IdCliente
+JOIN CarrinhoProduto cp ON cdc.IdCarrinho = cp.IdCarrinho
+JOIN Produto p ON cp.CodigoProduto = p.CodigoProduto
+WHERE c.Nome = 'João Silva';
+
+Exibir todas as vendas ordenadas por data:   
+SELECT v.NumeroVenda, c.Nome AS Cliente, p.Nome AS Produto, v.Data, v.QuantidadeVendida, v.Total
+FROM Venda v
+JOIN Cliente c ON v.IdCliente = c.IdCliente
+JOIN Produto p ON v.CodigoProduto = p.CodigoProduto
+ORDER BY v.Data;
+
+Mostrar clientes que compraram mais de 3 produtos diferentes:
+SELECT c.Nome AS Cliente, COUNT(DISTINCT v.CodigoProduto) AS ProdutosDiferentesComprados
+FROM Cliente c
+JOIN Venda v ON c.IdCliente = v.IdCliente
+GROUP BY c.Nome
+HAVING COUNT(DISTINCT v.CodigoProduto) > 3;
+
+ Listar os produtos com preço superior a R$ 15.00:
+SELECT CodigoProduto, Nome, PrecoUnitario
+FROM Produto
+WHERE PrecoUnitario > 15.00;
+
+Exibir clientes que compraram produtos fornecidos pelo "Fornecedor A":
+SELECT DISTINCT c.Nome AS Cliente
+FROM Cliente c
+JOIN Venda v ON c.IdCliente = v.IdCliente
+JOIN Produto p ON v.CodigoProduto = p.CodigoProduto
+JOIN Fornecedor f ON CHARINDEX(p.Nome, f.ProdutosFornecidos) > 0
+WHERE f.Nome = 'Fornecedor A';
+
+Mostrar o total de vendas por produto, ordenado por total decrescente:
+ELECT p.Nome AS Produto, SUM(v.Total) AS TotalVendas
+FROM Venda v
+JOIN Produto p ON v.CodigoProduto = p.CodigoProduto
+GROUP BY p.Nome
+ORDER BY TotalVendas DESC;
+
+
+
     
