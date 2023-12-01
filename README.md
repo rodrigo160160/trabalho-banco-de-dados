@@ -1,4 +1,37 @@
 # trabalho-banco-de-dados
+Uma empresa de varejo busca implementar um Sistema de Gerenciamento de Vendas para aprimorar suas operações diárias. As entidades identificadas são:
+
+Fornecedor:
+
+Responsável por abastecer a empresa com produtos. A entidade inclui atributos como nome, contato, ID, produto fornecido e endereço.
+Produto:
+
+Cada produto disponível no estoque é registrado no sistema, contendo atributos como código, nome, descrição, peso, preço.
+Vendas:
+
+Registro das transações de venda, incluindo atributos como total, quantidade vendida, data e número da venda.
+Cliente:
+
+Informações sobre os clientes são essenciais para o sistema, incluindo contato, endereço, ID e nome.
+CarrinhoDeCompra:
+
+Cada cliente tem um carrinho de compras exclusivo, identificado pelo número do carrinho, contendo a data da compra.
+Relacionamentos:
+
+Fornecedor - Produto (N:N):
+
+Um fornecedor pode fornecer vários produtos, e um produto pode ser fornecido por vários fornecedores. Este relacionamento requer uma tabela associativa.
+Produto - Vendas (1:N):
+
+Um produto pode estar presente em várias vendas, mas cada venda está associada a apenas um produto.
+Vendas - Cliente (1:N):
+
+Cada venda é realizada por um cliente específico, estabelecendo uma relação de 1:N.
+Cliente - CarrinhoDeCompra (1:1):
+
+Cada cliente possui um único carrinho de compras, e cada carrinho está associado a apenas um cliente.
+Este sistema oferecerá à empresa um controle eficiente sobre fornecedores, produtos, vendas, clientes e carrinhos de compra, contribuindo para operações mais eficazes e melhorando a experiência do cliente.
+
 
 Prints do DER e MER
 
